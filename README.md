@@ -2,7 +2,13 @@
 
 Eight small, synthetic scenarios for mistakes an agent's memory can make. Sixteen questions with explicit grading criteria, plus a dependency-free tool to export a single probe without its answers or future messages.
 
-**Not a leaderboard or a validated benchmark.** These are inspectable starter fixtures for debugging memory behavior. No memory system has been evaluated in this release.
+**Not a leaderboard or a validated benchmark.** These are inspectable starter fixtures for debugging memory behavior. A documented exploratory Mem0 observation is included below; no overall quality ranking is claimed.
+
+## One observed failure
+
+On April 2, a user says they only checked an application status. In one configured Mem0 OSS smoke, extraction stored that activity as April 1. The retrieved-memory answer then said there was no information about April 2; the same answer model with the original dialogue identified the status check correctly.
+
+[Read the example and inspect the synthetic evidence](examples/relative-date/README.md). It includes the exact answers, extraction output, model settings, and a significant limitation: the adapter's report timestamps and Mem0's own observation date used different years. This is a debugging example, not a general verdict on Mem0 or a benchmark score.
 
 ## What is inside
 
