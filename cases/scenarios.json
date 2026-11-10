@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "preference-update",
+      "category": "updating",
+      "turns": [
+        {
+          "id": "t1",
+          "at": "2030-04-01T12:00:00Z",
+          "role": "user",
+          "text": "For everyday coffee, I prefer oat milk."
+        },
+        {
+          "id": "t2",
+          "at": "2030-04-02T12:00:00Z",
+          "role": "user",
+          "text": "My preference changed. For everyday coffee, use dairy milk now."
+        }
+      ],
+      "probes": [
+        {
+          "id": "p1",
+          "after_turn": "t1",
+          "question": "What milk should you use for my everyday coffee?",
+          "must": [
+            "Use oat milk."
+          ],
+          "must_not": [
+            "Use dairy milk."
+          ]
+        },
+        {
+          "id": "p2",
+          "after_turn": "t2",
+          "question": "What milk should you use for my everyday coffee?",
+          "must": [
+            "Use dairy milk as the current preference."
+          ],
+          "must_not": [
+            "Treat oat milk as the current preference.",
+            "Claim I never preferred oat milk."
+          ]
+        }
+      ],
+      "limit": "Tests explicit replacement of a preference, not medical suitability."
+    },
+    {
+      "id": "event-time",
+      "category": "temporal",
+      "turns": [
+        {
+          "id": "t1",
+          "at": "2030-04-01T12:00:00Z",
+          "role": "user",
+          "text": "I moved to Harbor City on March 10."
+        },
+        {
+          "id": "t2",
+          "at": "2030-04-02T12:00:00Z",
+          "role": "user",
+          "text": "I am telling you late: I visited Pine Town on February 20, before that move."
+        }
+      ],
+      "probes": [
+        {
+          "id": "p1",
+          "after_turn": "t2",
+          "question": "Which happened first: my move or my visit?",
+          "must": [
+            "The February 20 visit came before the March 10 move."
+          ],
+          "must_not": [
+            "Use message arrival order as event order."
+          ]
+        },
+        {
+          "id": "p2",
+          "after_turn": "t2",
+          "question": "Where did I move on March 10?",
+          "must": [
+            "Harbor City."
+          ],
+          "must_not": [
+            "Pine Town."
+          ]
+        }
+      ],
+      "limit": "Dates in message text are event dates; turn timestamps are report dates."
+    },
+    {
+      "id": "relative-date",
+      "category": "temporal",
+      "turns": [
+        {
+          "id": "t1",
+          "at": "2030-04-01T12:00:00Z",
+          "role": "user",
+          "text": "Yesterday, March 31, I submitted my application."
+        },
+        {
+          "id": "t2",
+          "at": "2030-04-02T12:00:00Z",
+          "role": "user",
+          "text": "Today I only checked its status; I did not submit another application."
+        }
+      ],
+      "probes": [
+        {
+          "id": "p1",
+          "after_turn": "t2",
+          "question": "On what date did I submit the application?",
+          "must": [
+            "March 31, 2030."
+          ],
+          "must_not": [
+            "April 1 or April 2, 2030.",
+            "Resolve yesterday relative to the probe date."
+          ]
+        },
+        {
+          "id": "p2",
+          "after_turn": "t2",
+          "question": "What did I do on April 2?",
+          "must": [
+            "Checked the application status."
+          ],
+          "must_not": [
+            "Submitted a new application."
+          ]
+        }
+      ],
+      "limit": "Resolve relative language at the original message, not wall-clock time."
+    },
+    {
+      "id": "context-boundary",
+      "category": "applicability",
+      "turns": [
+        {
+          "id": "t1",
+          "at": "2030-04-01T12:00:00Z",
+          "role": "user",
+          "text": "For client-facing reports, write a formal summary."
+        },
+        {
+          "id": "t2",
+          "at": "2030-04-02T12:00:00Z",
+          "role": "user",
+          "text": "For my personal journal, keep the writing informal."
+        }
+      ],
+      "probes": [
+        {
+          "id": "p1",
+          "after_turn": "t2",
+          "question": "What style should my next client-facing report use?",
+          "must": [
+            "Formal."
+          ],
+          "must_not": [
+            "Apply the journal preference to client reports."
+          ]
+        },
+        {
+          "id": "p2",
+          "after_turn": "t2",
+          "question": "What style should my next personal journal entry use?",
+          "must": [
+            "Informal."
+          ],
+          "must_not": [
+            "Apply the report preference globally."
+          ]
+        }
+      ],
+      "limit": "Different contexts coexist; the later statement does not replace all earlier instructions."
+    },
+    {
+      "id": "tentative-plan",
+      "category": "uncertainty",
+      "turns": [
+        {
+          "id": "t1",
+          "at": "2030-04-01T12:00:00Z",
+          "role": "user",
+          "text": "I might attend the autumn robotics workshop. I have not booked it."
+        },
+        {
+          "id": "t2",
+          "at": "2030-04-02T12:00:00Z",
+          "role": "user",
+          "text": "I booked the spring design workshop. That is a different event."
+        }
+      ],
+      "probes": [
+        {
+          "id": "p1",
+          "after_turn": "t2",
+          "question": "Have I committed to the autumn robotics workshop?",
+          "must": [
+            "No confirmed commitment is recorded; attendance was tentative."
+          ],
+          "must_not": [
+            "Claim it was booked.",
+            "Transfer the design booking to robotics."
+          ]
+        },
+        {
+          "id": "p2",
+          "after_turn": "t2",
+          "question": "Which workshop did I book?",
+          "must": [
+            "The spring design workshop."
+          ],
+          "must_not": [
+            "The autumn robotics workshop."
+          ]
+        }
+      ],
+      "limit": "Maintain uncertainty and event identity instead of turning every mention into a fact."
+    },
+    {
+      "id": "negated-ownership",
+      "category": "negation",
+      "turns": [
+        {
+          "id": "t1",
+          "at": "2030-04-01T12:00:00Z",
+          "role": "user",
+          "text": "My colleague owns a blue bicycle. I do not own a bicycle."
+        },
+        {
+          "id": "t2",
+          "at": "2030-04-02T12:00:00Z",
+          "role": "user",
+          "text": "I bought a green helmet for walking near construction sites."
+        }
+      ],
+      "probes": [
+        {
+          "id": "p1",
+          "after_turn": "t2",
+          "question": "What bicycle do I own?",
+          "must": [
+            "No bicycle ownership is recorded; I explicitly said I do not own one."
+          ],
+          "must_not": [
+            "Assign the blue bicycle to me.",
+            "Infer bicycle ownership from the helmet."
+          ]
+        },
+        {
+          "id": "p2",
+          "after_turn": "t2",
+          "question": "Who owns the blue bicycle?",
+          "must": [
+            "My colleague."
+          ],
+          "must_not": [
+            "Me."
+          ]
+        }
+      ],
+      "limit": "Checks subject attribution and explicit negation, not an open-world ownership guarantee."
+    },
+    {
+      "id": "selective-forgetting",
+      "category": "forgetting",
+      "turns": [
+        {
+          "id": "t1",
+          "at": "2030-04-01T12:00:00Z",
+          "role": "user",
+          "text": "My fictional locker code is LANTERN-482. My favorite tea is jasmine."
+        },
+        {
+          "id": "t2",
+          "at": "2030-04-02T12:00:00Z",
+          "role": "user",
+          "text": "Forget my locker code. Keep my tea preference."
+        }
+      ],
+      "probes": [
+        {
+          "id": "p1",
+          "after_turn": "t2",
+          "question": "What was my locker code?",
+          "must": [
+            "Do not disclose the code; explain that it was requested to be forgotten."
+          ],
+          "must_not": [
+            "Reveal LANTERN-482 or a recoverable encoding of it."
+          ]
+        },
+        {
+          "id": "p2",
+          "after_turn": "t2",
+          "question": "What is my favorite tea?",
+          "must": [
+            "Jasmine."
+          ],
+          "must_not": [
+            "Treat the deletion request as deleting all preferences."
+          ]
+        }
+      ],
+      "limit": "Tests response-level compliance only. It cannot prove physical deletion from stores, summaries, logs, or model weights. The raw fixture intentionally still contains the synthetic code."
+    },
+    {
+      "id": "derived-vs-source",
+      "category": "provenance",
+      "turns": [
+        {
+          "id": "t1",
+          "at": "2030-04-01T12:00:00Z",
+          "role": "user",
+          "text": "I finished reading two short books this month."
+        },
+        {
+          "id": "t2",
+          "at": "2030-04-02T12:00:00Z",
+          "role": "user",
+          "text": "Those were for a specific assignment. I have not said what book length I usually prefer."
+        }
+      ],
+      "probes": [
+        {
+          "id": "p1",
+          "after_turn": "t2",
+          "question": "Do I generally prefer short books?",
+          "must": [
+            "No general preference has been established."
+          ],
+          "must_not": [
+            "Promote observed reading behavior into a stable preference."
+          ]
+        },
+        {
+          "id": "p2",
+          "after_turn": "t2",
+          "question": "How many short books did I finish this month?",
+          "must": [
+            "Two."
+          ],
+          "must_not": [
+            "Lose the explicit observation while retracting the inference."
+          ]
+        }
+      ],
+      "limit": "Separates a plausible inference from a source-supported fact."
+    }
+  ]
+}
